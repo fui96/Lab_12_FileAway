@@ -12,34 +12,57 @@ public class DataSaver {
         Scanner in = new Scanner(System.in);
         //Get info
         ArrayList<String> Records = new ArrayList<>();
+        String FileName = SafeInput.getNonZeroLenString(in,"Please enter the file name");
+        String WorkingDir = System.getProperty("user.dir") + "/src";
+        String FullFileName = WorkingDir + "/" + FileName + ".csv";
+        //Check that the file exists
+        try {
+            File DataFile = new File(FullFileName);
+            if(DataFile.createNewFile()){
+                System.out.println("File created: " + FullFileName);
+            }
+            else{
+                System.out.println("File already exists");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("An error occurred");
+        }
+
         do{
             String first, last, id, email, yob;
             first  = SafeInput.getNonZeroLenString(in,"Please enter the first name");
             last  = SafeInput.getNonZeroLenString(in,"Please enter the last name");
             id = SafeInput.getNonZeroLenString(in,"Please enter the ID number");
+            id = String.format("%06d", Integer.parseInt(id));
             email = SafeInput.getNonZeroLenString(in,"Please enter your email");
             yob = SafeInput.getNonZeroLenString(in,"Please enter the year of birth");
-            Records.add(first + ", " + last + ", " + id + ", " + email + ", " + yob);
+            yob  = String.format("%04d", Integer.parseInt(yob));
+            String Record = String.join(", ", first, last, id, email, yob);
+            Records.add(Record);
+            for(int i = 0; i < Records.size(); i++){
+                System.out.println(Records.get(i));
+            }
+            //Write to file after each record collection
+            try(BufferedWriter bw = new BufferedWriter(new FileWriter(FullFileName, true));) {
+                bw.write(Record);
+                bw.newLine();
+            }catch (Exception e){
+                e.printStackTrace();
+                System.out.println("An error occurred");
+            }
+
+
             Cont = SafeInput.getYNConfirm(in,"Would you like to add another record");
         }while(Cont);
-       // Select file or create file for data
+        System.out.println("\n All records added to: " + FullFileName);
 
-       String FileName = SafeInput.getNonZeroLenString(in,"Please enter the file name");
 
-       try{
-           File DataFile = new File(FileName);
-           if(DataFile.exists()){
-               for(int i = 0; i < Records.size(); i++){
-                   FileWriter TheWriter = new FileWriter(DataFile);
 
-                   TheWriter.write(Records.get(i));
 
-               }
-           }
-       } catch (Exception e) {
-           e.printStackTrace();
-           System.out.println("An error occurred");
-       }
+
+
+
 
 
 
